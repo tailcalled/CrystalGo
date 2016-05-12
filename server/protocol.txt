@@ -15,6 +15,9 @@ rows r on the board, separated by a whitespace.
 On the following r lines, the board is sent as a sequence of x's (for black
 stones), o's (for white stones) and spaces (for empty spaces).
 
+After the board, there will be a line with two numbers describing the number of
+stones black and white have captured.
+
 Turns
 -----
 
@@ -23,6 +26,10 @@ their next stone, with the first column being column 0 and the first row being
 row 0. If the player sends an invalid line, the server responds with a line
 containing exactly 'no'. Otherwise, all connected clients receive a new board
 snapshot with the updated state.
+
+A player may also write 'pass' in order to pass their turn. In this case, all
+connected clients will also receive a new board snapshot, even though the
+board hasn't changed.
 
 Win
 ---
