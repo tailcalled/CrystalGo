@@ -1,4 +1,4 @@
-package dk.ryhl.crystalgo;
+package crystalgo.client;
 
 /**
  * A role for a user in the go game.

@@ -1,4 +1,4 @@
-package dk.ryhl.crystalgo;
+package crystalgo.client;
 
 import java.io.*;
 import java.net.Socket;
