@@ -4,8 +4,7 @@ Crystal Go Protocol
 When connecting to a server, the client writes either 'spectate', 'black' or
 'white', depending on which role it wishes to have. In response, if the role is
 not available, the server writes 'no' followed by a newline, and waits for a
-new choice of role; otherwise it writes 'ok' followed by a newline and sends a
-snapshot of the current board.
+new choice of role; otherwise it sends a snapshot of the current board.
 
 Board Snapshot
 --------------
@@ -14,7 +13,7 @@ To send a snapshot of the board, the program sends the number of columns c and
 rows r on the board, separated by a whitespace.
 
 On the following r lines, the board is sent as a sequence of x's (for black
-stones), o's (for white stones) and spaces (for empty spaces.
+stones), o's (for white stones) and spaces (for empty spaces).
 
 Turns
 -----
