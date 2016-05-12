@@ -40,5 +40,14 @@ all clients, followed by the string ' wins', and then closes all connections.
 Msg
 ---
 
+<<<<<<< HEAD
 Both the server and the client may at any point send a line starting with the
 text 'msg '.
+=======
+A client may at any point write a line starting with 'msg '. We will call the
+part of the line after this string the message. After a client has sent this
+line, the server will broadcast the message to all clients, including the
+sender. The server will prepend 'msg ', followed by a unique number assigned
+ot the client, followed by ' ', to the message before broadcasting.
+
+>>>>>>> origin/master
