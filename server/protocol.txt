@@ -1,0 +1,31 @@
+Crystal Go Protocol
+===================
+
+When connecting to a server, the client writes either 'spectate', 'black' or
+'white', depending on which role it wishes to have. In response, if the role is
+not available, the server writes 'taken' and closes the connection; otherwise
+it writes 'ok' followed by a newline and sends a snapshot of the current board.
+
+Board Snapshot
+--------------
+
+To send a snapshot of the board, the program sends the number of columns c and
+rows r on the board, separated by a whitespace.
+
+On the following r lines, the board is sent as a sequence of x's (for black
+stones), o's (for white stones) and spaces (for empty spaces.
+
+Turns
+-----
+
+At each players turn, the player sends the column and row of where they place
+their next stone, with the first column being column 0 and the first row being
+row 0. If the player sends an invalid line, the server responds with a line
+containing exactly 'no'. Otherwise, all connected clients receive a new board
+snapshot with the updated state.
+
+Win
+---
+
+If a player wins, the server writes the color (either 'black' or 'white') to
+all clients, followed by the string ' wins', and then closes all connections.
