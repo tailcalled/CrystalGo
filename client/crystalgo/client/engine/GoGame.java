@@ -1,95 +1,23 @@
 package crystalgo.client.engine;
 
-import crystalgo.client.Role;
+import crystalgo.client.Move;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
- * Controls the players.
+ * Method for a player to interact with a game.
+ * When doMove is called, either all the StateListeners or all the InvalidMoveListeners will be called
+ * the new state.
  * Created by user on 13/05/16.
  */
-public class GoGame {
+public interface GoGame {
 
-    private final ArrayList<Player> spectators = new ArrayList<>();
-    private Player white, black;
-    private GoState state;
+    void addStateListener(Consumer<GoState> listener);
 
-    public void startGame() throws IllegalStateException {
-        poll(Role.black);
-    }
+    void addInvalidMoveListener(Consumer<GoState> listener);
 
-    public void addPlayer(Player player) {
-        if (player.getRole() == Role.white) {
-            if (white != null)
-                throw new IllegalStateException("this game already has a white player");
-            white = player;
-            return;
-        }
-        if (player.getRole() == Role.black) {
-            if (black != null)
-                throw new IllegalStateException("this game already has a black player");
-            black = player;
-            return;
-        }
-        spectators.add(player);
-    }
+    GoState getState();
 
-    /**
-     * Makes a game where all the moves come from a single source.
-     * Usually used for things like spectating a net game.
-     *
-     * @param spectator The source of all moves.
-     */
-    public void spectatorGame(Player spectator) {
-        if (white != null) {
-            if (black != null)
-                throw new IllegalStateException("this game already has a white and a black player");
-            throw new IllegalStateException("this game already has a white player");
-        }
-        if (black != null)
-            throw new IllegalStateException("this game already has a black player");
-        white = spectator;
-        black = spectator;
-    }
-
-    private void poll(final Role role) {
-        if (role == Role.spectate)
-            throw new IllegalArgumentException("poll a spectator");
-        final Player play = role == Role.white ? white : black;
-        play.readyForNextMove(state -> {
-            this.state = state;
-            updateState();
-            poll(role.inverse());
-        });
-    }
-
-    private void updateState() {
-        white.newGoState(state);
-        black.newGoState(state);
-        for (Player player : spectators) {
-            if (player == white || player == black)
-                continue;
-            player.newGoState(state);
-        }
-    }
-
-    public Iterable<GoState> getStates() {
-        return () -> new Iterator<GoState>() {
-            private GoState state = GoGame.this.state;
-
-            @Override
-            public boolean hasNext() {
-                return state != null;
-            }
-
-            @Override
-            public GoState next() {
-                GoState r = state;
-                state = state.getPreviousState().orElse(null);
-                return r;
-            }
-        };
-    }
+    void doMove(Move move);
 
 }
