@@ -1,4 +1,4 @@
-package crystalgo.client;
+package crystalgo.client.net;
 
 /**
  * Represents an invalid packet sent by the server.

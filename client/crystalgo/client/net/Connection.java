@@ -1,4 +1,6 @@
-package crystalgo.client;
+package crystalgo.client.net;
+
+import crystalgo.client.*;
 
 import java.io.*;
 import java.net.Socket;

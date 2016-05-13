@@ -1,6 +1,7 @@
-package crystalgo.client;
+package crystalgo.client.net;
 
-import com.sun.corba.se.spi.activation.Server;
+import crystalgo.client.Board;
+import crystalgo.client.Role;
 
 /**
  * Contains a ServerPacket
