@@ -26,6 +26,10 @@ public class GoState {
         this.move = move;
     }
 
+    public static GoState newGame(Board board) {
+        return new GoState(Role.black, board, null, 0, null);
+    }
+
     public Role getTurn() {
         return turn;
     }
