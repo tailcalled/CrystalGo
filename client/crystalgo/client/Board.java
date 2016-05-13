@@ -1,12 +1,12 @@
 package crystalgo.client;
 
 /**
- * Represents a go board
+ * Represents a go board. This class is immutable.
  * Created by user on 13/05/16.
  */
-public class Board {
-    final int width, height;
-    byte[][] data;
+public final class Board implements Cloneable {
+    public final int width, height;
+    private final byte[][] data;
 
     public Board(int width, int height) {
         this.width = width;
@@ -14,20 +14,21 @@ public class Board {
         data = new byte[height][width];
     }
 
-    public void setBlack(int x, int y) {
-        data[y][x] = 2;
-    }
-    public void setWhite(int x, int y) {
-        data[y][x] = 1;
-    }
-    public void setNone(int x, int y) {
-        data[y][x] = 0;
-    }
-    public void setSpot(int x, int y, SpotColor sc) {
-        data[y][x] = sc.color;
+    public Board setSpot(int x, int y, SpotColor sc) {
+        Board clone = clone();
+        clone.data[y][x] = sc.color;
+        return clone;
     }
     public SpotColor get(int x, int y) {
         return SpotColor.fromByte(data[y][x]);
+    }
+
+    @Override
+    public Board clone() {
+        Board b = new Board(width, height);
+        for (int i = 0; i < height; i++)
+            System.arraycopy(b.data[i], 0, data[i], 0, width);
+        return b;
     }
 
     public static Board parse(String[] lines) {
@@ -43,10 +44,4 @@ public class Board {
     }
 
 }
-/*
-f(' ') = 0
-f('o') = 1
-f('x') = 2
- */
-
 
