@@ -59,6 +59,7 @@ object ServerProtocol {
         case Array(x, y) =>
           (Try(x.toInt), Try(y.toInt)) match {
             case (Success(x_), Success(y_)) => Some(ProC2S.Place(x_, y_))
+            case _ => None
           }
         case _ => None
       }
