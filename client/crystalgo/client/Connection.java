@@ -7,7 +7,7 @@ import java.net.Socket;
  * A connection to a go server
  * Created by user on 12/05/16.
  */
-public class Connection {
+public class Connection implements Closeable, Flushable {
     private final BufferedReader in;
     private final PrintWriter out;
     public Connection(BufferedReader in, PrintWriter out) {
@@ -51,7 +51,15 @@ public class Connection {
         return Board.parse(board);
     }
 
+    @Override
+    public void close() throws IOException {
+        in.close();
+        out.close();
+    }
 
-
+    @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
 }
 
