@@ -15,19 +15,9 @@ public interface GameState {
     Role getTurn();
     Board getBoard();
 
-    /**
-     * Returns the previous state, or null if no previous state.
-     * @return The previous state, or null if no previous state.
-     */
-    GameState getPreviousState();
+    Optional<GameState> getPreviousState();
     int stateIndex();
-    /**
-     * Returns the previous move, or null if no previous move.
-     *
-     * This function returns null if and only if getPreviousState() returns null.
-     * @return The previous move, or null if no previous move.
-     */
-    Move getMove();
+    Optional<Move> getPreviousMove();
 
     /**
      * Performs the move in the argument.
