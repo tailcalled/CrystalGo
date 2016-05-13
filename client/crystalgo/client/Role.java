@@ -10,4 +10,13 @@ public enum Role {
     Role(SpotColor sc) {
         this.spotcolor = sc;
     }
+    public Role inverse() {
+        switch (this) {
+            case black:
+                return white;
+            case white:
+                return black;
+        }
+        return spectate;
+    }
 }
