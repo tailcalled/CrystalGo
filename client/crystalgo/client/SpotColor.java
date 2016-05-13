@@ -5,10 +5,12 @@ package crystalgo.client;
  * Created by user on 13/05/16.
  */
 public enum SpotColor {
-    black(2), white(1), empty(0);
+    black(2, Role.black), white(1, Role.white), empty(0, Role.spectate);
     public final byte color;
-    SpotColor(int color) {
+    public final Role role;
+    SpotColor(int color, Role role) {
         this.color = (byte) color;
+        this.role = role;
     }
     public static SpotColor fromChar(char c) {
         switch (c) {
