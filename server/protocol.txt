@@ -14,7 +14,7 @@ To send a snapshot of the board, the program sends the number of columns c and
 rows r on the board, separated by a whitespace.
 
 On the following r lines, the board is sent as a sequence of x's (for black
-stones), o's (for white stones) and spaces (for empty spaces).
+stones), o's (for white stones) and periods (for empty spaces).
 
 After the board, there will be a line with two numbers describing the number of
 stones black and white have captured.
