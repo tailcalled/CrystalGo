@@ -23,7 +23,7 @@ Turns
 
 At each players turn, the player sends the column and row of where they place
 their next stone, with the first column being column 0 and the first row being
-row 0. If the player sends an invalid line, the server responds with a line
+row 0. If the player sends an illegal move, the server responds with a line
 containing exactly 'no'. Otherwise, all connected clients receive a new board
 snapshot with the updated state.
 
