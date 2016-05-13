@@ -47,7 +47,7 @@ public class Connection implements Closeable, Flushable {
             return wish;
         }
     }
-    public ServerPacket nextPacket() throws IOException, InvalidPacketException {
+    public ServerPacket nextPacket() throws IOException {
         try {
             if (!messages.isEmpty())
                 return new MessagePacket(messages.pollFirst());
@@ -69,9 +69,6 @@ public class Connection implements Closeable, Flushable {
             return new BoardPacket(fetchBoard());
         } catch (Exception e) {
             if (e instanceof IOException) {
-                throw e;
-            }
-            if (e instanceof InvalidPacketException) {
                 throw e;
             }
             throw new InvalidPacketException(e);
