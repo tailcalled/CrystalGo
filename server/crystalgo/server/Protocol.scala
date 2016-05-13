@@ -48,7 +48,11 @@ object ServerProtocol {
           }
         ).mkString
       ).toVector :+
-      (s"${score(Black)} ${score(White)} $turn" + move.map {
+      (s"${score(Black)} ${score(White)} " +
+        (turn match {
+          case Black => "black "
+          case White => "white "
+        }) + move.map {
         case ProC2S.Pass => " pass"; case ProC2S.Place(x, y) => s" $x $y"
       }.getOrElse(""))
     case Msg(msg) => Vector("msg " + msg)
