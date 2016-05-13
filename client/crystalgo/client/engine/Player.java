@@ -3,7 +3,7 @@ package crystalgo.client.engine;
 import crystalgo.client.Move;
 import crystalgo.client.Role;
 
-import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 /**
  * A player is a source of moves.
@@ -18,7 +18,7 @@ public interface Player {
      *
      * @param performer This function receives the move that the player wishes to perform.
      */
-    void readyForNextMove(Callable<Move> performer);
+    void readyForNextMove(Consumer<Move> performer);
 
     Role getRole();
 
