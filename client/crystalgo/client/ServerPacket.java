@@ -20,10 +20,11 @@ class BoardPacket implements ServerPacket {
         this.board = board;
     }
 }
-class WinPacket implements ServerPacket {
+class WinnerPacket implements ServerPacket {
     public final Role winner;
 
-    public WinPacket(Role winner) {
+    public WinnerPacket(Role winner) {
         this.winner = winner;
     }
 }
+
