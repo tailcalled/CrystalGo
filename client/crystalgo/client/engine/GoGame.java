@@ -3,7 +3,7 @@ package crystalgo.client.engine;
 import crystalgo.client.Role;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Controls the players.
@@ -11,7 +11,6 @@ import java.util.Collections;
  */
 public class GoGame {
 
-    private final ArrayList<GoState> states = new ArrayList<>();
     private final ArrayList<Player> spectators = new ArrayList<>();
     private Player white, black;
     private GoState state;
@@ -63,7 +62,6 @@ public class GoGame {
         waitingFor = role;
         final Player play = role == Role.white ? white : black;
         play.readyForNextMove(move -> {
-            states.add(state);
             state = state.doMove(move);
             updateState();
             poll(role.inverse());
@@ -81,7 +79,21 @@ public class GoGame {
     }
 
     public Iterable<GoState> getStates() {
-        return Collections.unmodifiableList(states);
+        return () -> new Iterator<GoState>() {
+            private GoState state = GoGame.this.state;
+
+            @Override
+            public boolean hasNext() {
+                return state != null;
+            }
+
+            @Override
+            public GoState next() {
+                GoState r = state;
+                state = state.getPreviousState().orElse(null);
+                return r;
+            }
+        };
     }
 
 }
