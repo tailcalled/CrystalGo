@@ -14,12 +14,9 @@ public class GoGame {
     private final ArrayList<Player> spectators = new ArrayList<>();
     private Player white, black;
     private GoState state;
-    private Role waitingFor = Role.spectate;
 
     public void startGame() throws IllegalStateException {
-        if (waitingFor != Role.spectate)
-            throw new IllegalStateException("Game already started");
-        poll(Role.white);
+        poll(Role.black);
     }
 
     public void addPlayer(Player player) {
@@ -57,12 +54,11 @@ public class GoGame {
     }
 
     private void poll(final Role role) {
-        if (waitingFor == Role.spectate)
+        if (role == Role.spectate)
             throw new IllegalArgumentException("poll a spectator");
-        waitingFor = role;
         final Player play = role == Role.white ? white : black;
-        play.readyForNextMove(move -> {
-            state = state.doMove(move);
+        play.readyForNextMove(state -> {
+            this.state = state;
             updateState();
             poll(role.inverse());
         });
