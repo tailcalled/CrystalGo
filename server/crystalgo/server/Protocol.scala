@@ -37,12 +37,13 @@ object ServerProtocol {
     case ProS2C.Win(Black) => Vector("black wins")
     case ProS2C.Win(White) => Vector("white wins")
     case ProS2C.Snapshot(board) =>
+      (board.width + " " + board.height) +:
       (0 until board.height).map(y =>
         (0 until board.width).map(x =>
           board.stones.get((x, y)) match {
             case Some(Black) => "x"
             case Some(White) => "o"
-            case None => " "
+            case None => "."
           }
         ).mkString
       ).toVector

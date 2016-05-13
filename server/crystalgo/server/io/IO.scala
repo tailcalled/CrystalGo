@@ -53,10 +53,11 @@ object LineIn {
         line = Vector()
         Some(s)
       }
-      else {
-        line +:= b
+      else if (b != '\r') {
+        line :+= b
         None
       }
+      else None
     }
   }
 }
@@ -98,6 +99,7 @@ class ByteOut(stream: OutputStream) extends Out[Byte] {
       while (open) {
         val byte = queue.take()
         stream.write(byte)
+        stream.flush()
       }
     }
   }

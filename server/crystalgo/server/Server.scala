@@ -15,11 +15,11 @@ class Client(input: InputStream, output: OutputStream) {
   def close() = { send.close(); recv.close() }
 }
 
-class Server(accept: () => Option[Client], komiMinusHalf: Int = 7) {
+class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 19, komiMinusHalf: Int = 7) {
   
   var running = true
   
-  var state = Game(Black, _ => 0, Board(Map(), 19, 19), Vector())
+  var state = Game(Black, _ => 0, Board(Map(), size, size), Vector())
   var conns = Vector[Client]()
   var clients = Vector[Client]()
   var playerBlack: Client = null
@@ -161,12 +161,14 @@ class Server(accept: () => Option[Client], komiMinusHalf: Int = 7) {
   }
   def win(player: Stone) = {
     for (c <- clients) c.send.put(ProS2C.Win(player))
+    stop()
   }
   
   def stop() = {
     running = false
     threads.foreach(_.interrupt())
     conns.foreach(_.close())
+    closeSocket()
   }
   
 }
