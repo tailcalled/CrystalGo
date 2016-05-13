@@ -49,21 +49,22 @@ object Board {
     filterNot(stones.contains _)
   def sq(group: Set[(Int, Int)], width: Int, height: Int) =
     group.filter { case (x, y) => x >= 0 && y >= 0 && x < width && y < height }
-  def neighbors(stones: Map[(Int, Int), Stone], x: Int, y: Int) = {
+  def neighbors[A](stones: Map[(Int, Int), A], x: Int, y: Int) = {
     val color = stones((x, y))
     val neighbors = 
       group(stones, x, y).flatMap{ case (x, y) => Set((x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1))}.
-      filter(stones.get(_) == Some(color.opposite))
+      filter(stones.get(_).exists(_ != color))
     neighbors
   }
 }
-case class Game(turn: Stone, score: Stone => Int, state: Board, history: Vector[Board]) {
-  def place(x: Int, y: Int): Option[Game] = state.place(turn, x, y) match {
+case class Game(turn: Stone, score: Stone => Int, board: Board, history: Vector[Board]) {
+  def place(x: Int, y: Int): Option[Game] = board.place(turn, x, y) match {
     case None => None
-    case Some((newState, scoreChange)) =>
-      if (history.contains(newState)) None else {
+    case Some((newBoard, scoreChange)) =>
+      if (history.contains(newBoard)) None else {
         val newScore = scoreChange.map { case (k, v) => (k: Stone) -> (score(k) + v) }
-        Some(Game(turn.opposite, newScore.apply _, newState, history :+ state))
+        Some(Game(turn.opposite, newScore.apply _, newBoard, history :+ board))
       }
   }
+  def pass = Game(turn.opposite, score, board, board +: history)
 }
