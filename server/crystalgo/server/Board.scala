@@ -17,7 +17,7 @@ case class Board(stones: Map[(Int, Int), Stone], width: Int, height: Int) {
       val remove = neighs.filter {
         case (x_, y_) => Board.sq(Board.liberties(stones1, x_, y_), width, height).isEmpty
       }
-      val removeGroups = remove.flatMap { case (x_, y_) => Board.neighbors(stones1, x_, y_) }
+      val removeGroups = remove.flatMap { case (x_, y_) => Board.group(stones1, x_, y_) }
       val stones2 = stones1 -- removeGroups
       val removeSelf = Board.group(stones2, x, y)
       val stones3 =
