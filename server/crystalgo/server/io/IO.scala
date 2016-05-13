@@ -74,7 +74,7 @@ object LineOut {
 class ByteIn(stream: InputStream) extends In[Byte] {
   var open = true
   val queue = new LinkedBlockingQueue[Byte]()
-  val thread = new Thread() {
+  val thread = new Thread("Stream IO Thread") {
     override def run(): Unit = {
       while (open) {
         val i = stream.read()
@@ -89,12 +89,13 @@ class ByteIn(stream: InputStream) extends In[Byte] {
   def close() = {
     open = false
     stream.close()
+    thread.interrupt()
   }
 }
 class ByteOut(stream: OutputStream) extends Out[Byte] {
   var open = true
   val queue = new LinkedBlockingQueue[Byte]()
-  val thread = new Thread() {
+  val thread = new Thread("Stream IO Thread") {
     override def run(): Unit = {
       while (open) {
         val byte = queue.take()
@@ -108,5 +109,6 @@ class ByteOut(stream: OutputStream) extends Out[Byte] {
   def close() = {
     open = false
     stream.close()
+    thread.interrupt()
   }
 }

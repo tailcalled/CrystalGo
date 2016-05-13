@@ -17,7 +17,8 @@ On the following r lines, the board is sent as a sequence of x's (for black
 stones), o's (for white stones) and periods (for empty spaces).
 
 After the board, there will be a line with two numbers describing the number of
-stones black and white have captured.
+stones black and white have captured so far, followed by a space and the player
+whose turn it currently is.
 
 Turns
 -----
@@ -31,6 +32,9 @@ snapshot with the updated state.
 A player may also write 'pass' in order to pass their turn. In this case, all
 connected clients will also receive a new board snapshot, even though the
 board hasn't changed.
+
+At the end of the line where the number of captured pieces is shown, the will
+be a space, followed by the move that has just been taken.
 
 Win
 ---

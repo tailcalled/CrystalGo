@@ -8,14 +8,20 @@ import crystalgo.server.io.LineIn
 import java.io.OutputStream
 import java.io.InputStream
 import scala.annotation.tailrec
+import crystalgo.server.io.In
+import crystalgo.server.io.Out
 
-class Client(input: InputStream, output: OutputStream) {
-  val send = ServerProtocol.out(LineOut(new ByteOut(output)))
-  val recv = ServerProtocol.in(LineIn(new ByteIn(input)))
+class Client(val send: Out[ProS2C], val recv: In[ProC2S]) {
+  def this(input: InputStream, output: OutputStream) =
+    this(
+      ServerProtocol.out(LineOut(new ByteOut(output))),
+      ServerProtocol.in(LineIn(new ByteIn(input)))
+    )
   def close() = { send.close(); recv.close() }
 }
 
-class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 19, komiMinusHalf: Int = 7) {
+class Server(accept: () => Option[Client], closeSocket: () => Unit,
+    message: (String, Client) => Unit = (s, c) => {}, size: Int = 19, komiMinusHalf: Int = 7) {
   
   var running = true
   
@@ -25,8 +31,9 @@ class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 
   var playerBlack: Client = null
   var playerWhite: Client = null
   val lock = new Object
+  var prevMove: Option[Move] = None
   
-  val acceptThread = new Thread() {
+  val acceptThread = new Thread("Accept Thread") {
     override def run() = {
       while (running) {
         accept() match {
@@ -41,7 +48,7 @@ class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 
   
   private def connectClient(c: Client) = {
     conns :+= c
-    val joinThread = new Thread() {
+    val joinThread = new Thread("Joining Player") {
       override def run() = {
         joinClient(c)
       }
@@ -84,7 +91,7 @@ class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 
         ok = false
     }
     if (go) {
-      val goThread = new Thread() {
+      val goThread = new Thread("Game Thread") {
         override def run() = {
           runGame()
         }
@@ -96,7 +103,7 @@ class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 
   }
   def addClient(c: Client) = lock.synchronized {
     c.send.put(ProS2C.Ok)
-    c.send.put(ProS2C.Snapshot(state.board))
+    c.send.put(ProS2C.Snapshot(state.board, state.score, state.turn, prevMove))
     clients :+= c
   }
   def runGame() = {
@@ -112,25 +119,31 @@ class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 
           case None => // do nothing
         }
       }
-      Thread.sleep(10)
       currentPlayer.recv.poll() match {
         case Some(Msg(str)) => handleMessage(str, currentPlayer)
         case Some(ProC2S.Place(x, y)) =>
           state.place(x, y) match {
             case Some(newState) =>
+              prevMove = Some(ProC2S.Place(x, y))
               state = newState
               stateUpdated()
             case None => currentPlayer.send.put(ProS2C.No)
           }
         case Some(ProC2S.Pass) =>
+          prevMove = Some(ProC2S.Pass)
           state = state.pass
           stateUpdated()
-          if (state.history.take(3) == Vector(state.board, state.board, state.board)) {
+          if (state.history.take(2) == Vector(state.board, state.board)) {
             val scoreTaken = state.score
             val board = state.board
             val width = board.width
             val height = board.height
-            val boardFilled = (0 until board.width).zip(0 until board.height).map(x => x -> board.stones.lift(x)).toMap
+            val boardFilled =
+              (0 until board.width).flatMap(x =>
+                (0 until board.height).map(y =>
+                  (x, y) -> board.stones.lift((x, y))
+                )
+              ).toMap
             val playerStones = Vector[Stone](Black, White).map(owner =>
               owner -> board.stones.toSet[((Int, Int), Stone)].collect { case (p, `owner`) => p }
             ).toMap
@@ -151,13 +164,14 @@ class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 
         case Some(_) => currentPlayer.send.put(ProS2C.No)
         case None => // do nothing
       }
+      Thread.sleep(10)
     }
   }
   def handleMessage(msg: String, sender: Client) = {
-    // nyi
+    message(msg, sender)
   }
   def stateUpdated() = {
-    for (c <- clients) c.send.put(ProS2C.Snapshot(state.board))
+    for (c <- clients) c.send.put(ProS2C.Snapshot(state.board, state.score, state.turn, prevMove))
   }
   def win(player: Stone) = {
     for (c <- clients) c.send.put(ProS2C.Win(player))
@@ -166,9 +180,9 @@ class Server(accept: () => Option[Client], closeSocket: () => Unit, size: Int = 
   
   def stop() = {
     running = false
-    threads.foreach(_.interrupt())
     conns.foreach(_.close())
     closeSocket()
+    threads.foreach(_.interrupt())
   }
   
 }
