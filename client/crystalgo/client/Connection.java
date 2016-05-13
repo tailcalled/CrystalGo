@@ -2,6 +2,8 @@ package crystalgo.client;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayDeque;
+import java.util.Stack;
 
 /**
  * A connection to a go server
@@ -10,6 +12,8 @@ import java.net.Socket;
 public class Connection implements Closeable, Flushable {
     private final BufferedReader in;
     private final PrintWriter out;
+    private final ArrayDeque<String> messages = new ArrayDeque<>();
+    private final Stack<String> pushback = new Stack<>();
     public Connection(BufferedReader in, PrintWriter out) {
         this.in = in;
         this.out = out;
@@ -34,21 +38,66 @@ public class Connection implements Closeable, Flushable {
             return r;
         } else {
             out.println(wish.toString());
-            String role = in.readLine();
+            String role = nextLine();
             if (role.equals("no")) {
                 return null;
             }
             return wish;
         }
     }
-    public Board fetchBoard() throws IOException {
-        String[] line = in.readLine().split(" ");
+    public ServerPacket nextPacket() throws IOException, InvalidPacketException {
+        try {
+            if (!messages.isEmpty())
+                return new MessagePacket(messages.pollFirst());
+            String nextLine = readLine();
+            if (nextLine.startsWith("msg ")) {
+                return new MessagePacket(nextLine.substring(4));
+            }
+            String[] split = nextLine.split(" ");
+            if (split.length == 1) {
+                if (nextLine.equals("no")) {
+                    return new InvalidMovePacket();
+                }
+            }
+            if (split.length != 2)
+                throw new InvalidPacketException();
+            if (split[1].equals("wins"))
+                return new WinnerPacket(Role.valueOf(split[0]));
+            pushback.push(nextLine);
+            return new BoardPacket(fetchBoard());
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw e;
+            }
+            if (e instanceof InvalidPacketException) {
+                throw e;
+            }
+            throw new InvalidPacketException(e);
+        }
+    }
+
+    private Board fetchBoard() throws IOException {
+        String l = nextLine();
+        String[] line = l.split(" ");
         int h = Integer.parseInt(line[1]);
         String[] board = new String[h];
         for (int y = 0; y < h; y++) {
-            board[y] = in.readLine();
+            board[y] = nextLine();
         }
         return Board.parse(board);
+    }
+    private String nextLine() throws IOException {
+        String l = readLine();
+        while (l.startsWith("msg ")) {
+            messages.addLast(l.substring(4));
+            l = readLine();
+        }
+        return l;
+    }
+    private String readLine() throws IOException {
+        if (pushback.isEmpty())
+            return in.readLine();
+        return pushback.pop();
     }
 
     @Override
