@@ -1,5 +1,7 @@
 package crystalgo.client;
 
+import com.sun.corba.se.spi.activation.Server;
+
 /**
  * Contains a ServerPacket
  * Created by user on 13/05/16.
@@ -27,4 +29,5 @@ class WinnerPacket implements ServerPacket {
         this.winner = winner;
     }
 }
+class InvalidMovePacket implements ServerPacket {}
 
