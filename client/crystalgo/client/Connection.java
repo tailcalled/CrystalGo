@@ -41,6 +41,17 @@ public class Connection {
             return wish;
         }
     }
+    public Board fetchBoard() throws IOException {
+        String[] line = in.readLine().split(" ");
+        int h = Integer.parseInt(line[1]);
+        String[] board = new String[h];
+        for (int y = 0; y < h; y++) {
+            board[y] = in.readLine();
+        }
+        return Board.parse(board);
+    }
+
+
 
 }
 
