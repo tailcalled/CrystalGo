@@ -35,7 +35,7 @@ public class Connection {
         } else {
             out.println(wish.toString());
             String role = in.readLine();
-            if (role.equals("taken")) {
+            if (role.equals("no")) {
                 return null;
             }
             return wish;
