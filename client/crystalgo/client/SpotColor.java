@@ -12,6 +12,15 @@ public enum SpotColor {
         this.color = (byte) color;
         this.role = role;
     }
+    public SpotColor inverse() {
+        switch (this) {
+            case black:
+                return white;
+            case white:
+                return black;
+        }
+        return empty;
+    }
     public static SpotColor fromChar(char c) {
         switch (c) {
             case ' ':
