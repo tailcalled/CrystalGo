@@ -17,17 +17,19 @@ public final class GoState {
     private final GoState parent;
     private final int depth;
     private final Move move;
+    private final boolean over;
 
-    public GoState(Role turn, Board board, GoState parent, int depth, Move move) {
+    public GoState(Role turn, Board board, GoState parent, int depth, Move move, boolean over) {
         this.turn = turn;
         this.board = board;
         this.parent = parent;
         this.depth = depth;
         this.move = move;
+        this.over = over;
     }
 
     public static GoState newGame(Board board) {
-        return new GoState(Role.black, board, null, 0, null);
+        return new GoState(Role.black, board, null, 0, null, false);
     }
 
     public Role getTurn() {
@@ -50,6 +52,10 @@ public final class GoState {
         return Optional.ofNullable(move);
     }
 
+    public GoState gameIsOver() {
+        return new GoState(turn, board, parent, depth, move, true);
+    }
+
     /**
      * Performs the move in the argument. This function does not check if a move is invalid.
      * @param move The move to perform.
@@ -57,7 +63,11 @@ public final class GoState {
      */
     public GoState doMove(Move move) {
         Board b = board.setSpot(move.x, move.y, getTurn().spotcolor);
-        return new GoState(turn.inverse(), b, this, depth + 1, move);
+        return new GoState(turn.inverse(), b, this, depth + 1, move, over);
+    }
+
+    public boolean isGameOver() {
+        return over;
     }
 
 }
