@@ -10,7 +10,7 @@ import java.util.Optional;
  * A class which represents the state of a game of go. This class is immutable.
  * Created by user on 13/05/16.
  */
-public class GoState {
+public final class GoState {
 
     private final Role turn;
     private final Board board;
