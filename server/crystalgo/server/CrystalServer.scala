@@ -96,7 +96,7 @@ trait Mirror {
 class CrystalServer(private var modules: Map[String, CrystalModule] = Map(),
     port: Int = 8448, size: Int = 19, komiMinusHalf: Int = 7) {
   
-  val socket = new ServerSocket(8448)
+  val socket = new ServerSocket(port)
   var ids = Map[Client, Int]()
   val lock = new Object
   var id = 0
@@ -152,6 +152,10 @@ class CrystalServer(private var modules: Map[String, CrystalModule] = Map(),
       }
       module.installHooks(mirror)
     }
+  }
+  
+  def close() = {
+    server.stop()
   }
   
 }
