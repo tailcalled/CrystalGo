@@ -1,6 +1,8 @@
 package crystalgo.client.net;
 
-import crystalgo.client.*;
+import crystalgo.client.Board;
+import crystalgo.client.Move;
+import crystalgo.client.Role;
 
 import java.io.*;
 import java.net.Socket;
@@ -52,6 +54,8 @@ public class Connection implements Closeable, Flushable {
             if (!messages.isEmpty())
                 return new MessagePacket(messages.pollFirst());
             String nextLine = readLine();
+            if (nextLine == null)
+                return null;
             if (nextLine.startsWith("msg ")) {
                 return new MessagePacket(nextLine.substring(4));
             }
@@ -66,7 +70,7 @@ public class Connection implements Closeable, Flushable {
             if (split[1].equals("wins"))
                 return new WinnerPacket(Role.valueOf(split[0]));
             pushback.push(nextLine);
-            return new BoardPacket(fetchBoard());
+            return fetchBoard();
         } catch (Exception e) {
             if (e instanceof IOException) {
                 throw e;
@@ -75,7 +79,7 @@ public class Connection implements Closeable, Flushable {
         }
     }
 
-    private Board fetchBoard() throws IOException {
+    private BoardPacket fetchBoard() throws IOException {
         String l = nextLine();
         String[] line = l.split(" ");
         int h = Integer.parseInt(line[1]);
@@ -83,7 +87,17 @@ public class Connection implements Closeable, Flushable {
         for (int y = 0; y < h; y++) {
             board[y] = nextLine();
         }
-        return Board.parse(board);
+        Board b = Board.parse(board);
+        String[] points = nextLine().split(" ");
+        int black_points = Integer.parseInt(points[0]);
+        int white_points = Integer.parseInt(points[1]);
+        Role turn = Role.valueOf(points[2]);
+        Move move;
+        if (points.length > 3)
+            move = new Move(Integer.parseInt(points[3]), Integer.parseInt(points[4]));
+        else
+            move = null;
+        return new BoardPacket(b, move, turn, white_points, black_points);
     }
     private String nextLine() throws IOException {
         String l = readLine();
