@@ -10,7 +10,7 @@ import java.awt.*;
  * A class for drawing a go board on the screen.
  * Created by user on 13/05/16.
  */
-public class JBoard extends JComponent {
+public final class JBoard extends JComponent {
 
     private Board board;
     private Color white = new Color(60, 60, 60), black = Color.black;
