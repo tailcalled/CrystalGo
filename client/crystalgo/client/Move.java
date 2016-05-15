@@ -1,11 +1,10 @@
 package crystalgo.client;
 
 /**
- * Represents a move on a go board.
- * Immutable.
+ * Represents a move on a go board. This class is immutable.
  * Created by user on 13/05/16.
  */
-public class Move {
+public final class Move {
 
     public final int x, y;
 
