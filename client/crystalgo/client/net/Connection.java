@@ -93,7 +93,7 @@ public class Connection implements Closeable, Flushable {
             board[y] = nextLine();
         }
         Board b = Board.parse(board);
-        String[] points = nextLine().split(" ");
+        String[] points = nextLine().split(" +");
         int black_points = Integer.parseInt(points[0]);
         int white_points = Integer.parseInt(points[1]);
         Role turn = Role.valueOf(points[2].toLowerCase());
