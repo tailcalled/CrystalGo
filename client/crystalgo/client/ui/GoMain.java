@@ -34,7 +34,7 @@ public class GoMain {
         window.add(view);
         window.setPreferredSize(view.getPreferredSize());
         window.setLocationRelativeTo(null);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
         game.startThread();
         while (game.getState().getWinner() == Role.spectate) {
