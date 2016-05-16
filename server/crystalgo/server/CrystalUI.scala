@@ -111,7 +111,7 @@ class CrystalUI extends Application {
     grid.getChildren.addAll(sizeLabel, sizeBox)
     val komiLabel = new Label("Komi:")
     val komiBox = new Spinner[Integer](5, 12, 7, 1)
-    val komiLabel2 = new Label("+ ½")
+    val komiLabel2 = new Label("+ Â½")
     GridPane.setConstraints(komiLabel, 0, 3)
     GridPane.setConstraints(komiBox, 4, 3)
     GridPane.setConstraints(komiLabel2, 5, 3)
