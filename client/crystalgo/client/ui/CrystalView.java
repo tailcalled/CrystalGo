@@ -11,19 +11,18 @@ import java.awt.*;
  * A JComponent which
  * Created by user on 15/05/16.
  */
-public final class GoView extends JPanel {
+public final class CrystalView extends JPanel {
 
     public final JBoard jBoard;
     private final GoGame game;
 
-    public GoView(GoGame game, Container comp) {
+    public CrystalView(GoGame game, Container comp) {
         this.game = game;
         jBoard = new JBoard(game.getState().getBoard());
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.CENTER;
         this.add(jBoard, c);
-        setLayout(layout);
         game.addInvalidMoveListener(state ->
                 JOptionPane.showMessageDialog(jBoard, "Invalid move.", "Invalid move.", JOptionPane.ERROR_MESSAGE)
         );
