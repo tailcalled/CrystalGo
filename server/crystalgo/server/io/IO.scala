@@ -1,10 +1,9 @@
 package crystalgo.server.io
 
-import java.io.InputStream
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.io.OutputStream
-import java.util.concurrent.LinkedBlockingQueue
+import java.io.{InputStream, OutputStream}
 import java.nio.charset.Charset
+import java.util.concurrent.LinkedBlockingQueue
+
 import scala.annotation.tailrec
 
 trait In[+A] { self =>
@@ -66,13 +65,12 @@ object LineOut {
   def apply(bytes: Out[Byte]) = {
     bytes.unfold { (line: String) =>
       if (line.contains("\n")) throw new Exception
-      utf8.encode(line + "\n").array().toVector
+      (line + "\n").getBytes(utf8).toVector
     }
   }
 }
 
 class ByteIn(stream: InputStream) extends In[Byte] {
-  var open = true
   val queue = new LinkedBlockingQueue[Byte]()
   val thread = new Thread("Stream IO Thread") {
     override def run(): Unit = {
@@ -83,7 +81,9 @@ class ByteIn(stream: InputStream) extends In[Byte] {
       }
     }
   }
+  var open = true
   thread.start()
+
   def poll() = Option(queue.poll())
   def await() = queue.take()
   def close() = {
@@ -93,7 +93,6 @@ class ByteIn(stream: InputStream) extends In[Byte] {
   }
 }
 class ByteOut(stream: OutputStream) extends Out[Byte] {
-  var open = true
   val queue = new LinkedBlockingQueue[Byte]()
   val thread = new Thread("Stream IO Thread") {
     override def run(): Unit = {
@@ -104,7 +103,9 @@ class ByteOut(stream: OutputStream) extends Out[Byte] {
       }
     }
   }
+  var open = true
   thread.start()
+
   def put(b: Byte) = { queue.put(b) }
   def close() = {
     open = false
