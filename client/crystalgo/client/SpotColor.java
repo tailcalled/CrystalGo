@@ -12,26 +12,19 @@ public enum SpotColor {
         this.color = (byte) color;
         this.role = role;
     }
-    public SpotColor inverse() {
-        switch (this) {
-            case black:
-                return white;
-            case white:
-                return black;
-        }
-        return empty;
-    }
+
     public static SpotColor fromChar(char c) {
         switch (c) {
-            case ' ':
+            case '.':
                 return empty;
             case 'o':
                 return white;
             case 'x':
                 return black;
         }
-        throw new IllegalArgumentException("Not a spotcolor: " + c);
+        throw new IllegalArgumentException("Not a spotcolor: " + c + " (" + ((int) c) + ")");
     }
+
     public static SpotColor fromByte(byte b) {
         switch (b) {
             case 0:
@@ -42,5 +35,15 @@ public enum SpotColor {
                 return black;
         }
         throw new IllegalArgumentException("Not a spotcolor: " + b);
+    }
+
+    public SpotColor inverse() {
+        switch (this) {
+            case black:
+                return white;
+            case white:
+                return black;
+        }
+        return empty;
     }
 }

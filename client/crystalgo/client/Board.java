@@ -14,23 +14,6 @@ public final class Board implements Cloneable {
         data = new byte[height][width];
     }
 
-    public Board setSpot(int x, int y, SpotColor sc) {
-        Board clone = clone();
-        clone.data[y][x] = sc.color;
-        return clone;
-    }
-    public SpotColor get(int x, int y) {
-        return SpotColor.fromByte(data[y][x]);
-    }
-
-    @Override
-    public Board clone() {
-        Board b = new Board(width, height);
-        for (int i = 0; i < height; i++)
-            System.arraycopy(b.data[i], 0, data[i], 0, width);
-        return b;
-    }
-
     public static Board parse(String[] lines) {
         Board b = new Board(lines[0].length(), lines.length);
         for (int j = 0; j < lines.length; j++) {
@@ -40,6 +23,24 @@ public final class Board implements Cloneable {
                 dat[i] = SpotColor.fromChar(chars[i]).color;
             }
         }
+        return b;
+    }
+
+    public Board setSpot(int x, int y, SpotColor sc) {
+        Board clone = clone();
+        clone.data[y][x] = sc.color;
+        return clone;
+    }
+
+    public SpotColor get(int x, int y) {
+        return SpotColor.fromByte(data[y][x]);
+    }
+
+    @Override
+    public Board clone() {
+        Board b = new Board(width, height);
+        for (int i = 0; i < height; i++)
+            System.arraycopy(b.data[i], 0, data[i], 0, width);
         return b;
     }
 

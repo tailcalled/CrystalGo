@@ -5,6 +5,10 @@ import crystalgo.client.SpotColor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /**
  * A class for drawing a go board on the screen.
@@ -15,6 +19,7 @@ public final class JBoard extends JComponent {
     private Board board;
     private Color white = new Color(60, 60, 60), black = Color.black;
     private int cellPix = 32, borderPix = 4;
+    private ArrayList<Consumer<Point>> pressListeners = new ArrayList<>();
 
     public JBoard(Board board) {
         this.board = board;
@@ -22,6 +27,7 @@ public final class JBoard extends JComponent {
         setBackground(Color.white);
         setForeground(Color.black);
         updateSize();
+        addMouseListener(new JBML());
     }
 
     public Color getWhite() {
@@ -72,23 +78,51 @@ public final class JBoard extends JComponent {
 
     private void updateSize() {
         int f = cellPix + borderPix;
-        setSize(borderPix + f * board.width, borderPix + f * board.height);
+        Dimension dim = new Dimension(borderPix + f * board.width, borderPix + f * board.height);
+        setSize(dim);
+        setPreferredSize(dim);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return getSize();
+    }
+
+    @Override
+    public Dimension getMaximumSize() {
+        return getSize();
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return getSize();
+    }
+
+    @Override
+    public Dimension getSize() {
+        int f = cellPix;
+        return new Dimension(f * board.width, f * board.height);
     }
 
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
-        Graphics g = graphics.create();
+        Graphics2D g = (Graphics2D) graphics.create();
         if (isOpaque()) {
             g.setColor(getBackground());
-            g.fillRect(0, 0, getWidth(), getHeight());
+            int w = getWidth();
+            int h = getHeight();
+            g.fillRect(0, 0, w, h);
         }
-        int f = cellPix + borderPix;
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        int f = cellPix;
+        g.setColor(getForeground());
+        int offset = (cellPix - borderPix) / 2;
         for (int x = 0; x < board.width; x++) {
-            g.fillRect(x * f, 0, borderPix, getHeight());
+            g.fillRect(offset + x * f, offset, borderPix, getHeight() - 2 * offset);
         }
         for (int y = 0; y < board.height; y++) {
-            g.fillRect(0, y * f, getWidth(), borderPix);
+            g.fillRect(offset, offset + y * f, getWidth() - 2 * offset, borderPix);
         }
         for (int x = 0; x < board.width; x++) {
             for (int y = 0; y < board.height; y++) {
@@ -103,10 +137,61 @@ public final class JBoard extends JComponent {
                     case empty:
                         continue;
                 }
-                g.fillOval(2 + f * x + borderPix, 2 + f * y + borderPix, cellPix - 4, cellPix - 4);
+                g.fillOval(2 + f * x, 2 + f * y, cellPix - 4, cellPix - 4);
             }
         }
         g.dispose();
+    }
+
+    public void addPressListener(Consumer<Point> l) {
+        pressListeners.add(l);
+    }
+
+    private void handlePress(int x, int y) {
+        Point p = new Point(x, y);
+        pressListeners.forEach(l -> l.accept(p));
+    }
+
+    private class JBML implements MouseListener {
+
+        private int press_x = -1, press_y = -1;
+
+        @Override
+        public void mousePressed(MouseEvent mouseEvent) {
+            press_x = getCell(mouseEvent.getX(), board.width);
+            press_y = getCell(mouseEvent.getY(), board.height);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent mouseEvent) {
+            int px = getCell(mouseEvent.getX(), board.width);
+            int py = getCell(mouseEvent.getY(), board.height);
+            if (px != press_x || py != press_y)
+                return;
+            if (px == -1 || py == -1)
+                return;
+            handlePress(px, py);
+        }
+
+        private int getCell(int coord, int max) {
+            int div = cellPix;
+            int cell = coord / div;
+            if (cell < 0 || cell >= max)
+                return -1;
+            return cell;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent mouseEvent) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent mouseEvent) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent mouseEvent) {
+        }
     }
 }
 

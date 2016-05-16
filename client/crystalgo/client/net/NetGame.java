@@ -1,6 +1,8 @@
 package crystalgo.client.net;
 
+import crystalgo.client.Board;
 import crystalgo.client.Move;
+import crystalgo.client.Role;
 import crystalgo.client.engine.GoGame;
 import crystalgo.client.engine.GoState;
 
@@ -49,7 +51,11 @@ public class NetGame implements GoGame {
     private void handlePacket(ServerPacket p) throws InvalidPacketException {
         if (p instanceof BoardPacket) {
             BoardPacket bp = (BoardPacket) p;
-            GoState gostate = new GoState(bp.turn, bp.board, state, state.stateIndex() + 1, bp.move, state.getWinner());
+            GoState gostate;
+            if (state == null || bp.move == null)
+                gostate = new GoState(bp.turn, bp.board, null, 0, bp.move, Role.spectate);
+            else
+                gostate = new GoState(bp.turn, bp.board, state, state.stateIndex() + 1, bp.move, state.getWinner());
             this.state = gostate;
             stateListeners.forEach(listener -> listener.accept(gostate));
             return;
@@ -88,12 +94,27 @@ public class NetGame implements GoGame {
 
     @Override
     public GoState getState() {
+        checkThread();
+        if (state == null)
+            return GoState.newGame(new Board(19, 19));
         return state;
     }
 
     @Override
     public void doMove(Move move) {
+        checkThread();
+        connection.doMove(move);
+        try {
+            connection.flush();
+        } catch (IOException ioe) {
+            this.ioe = ioe;
+        }
+    }
+
+    private void checkThread() {
         if (ioe != null) {
+            IOException ioe = this.ioe;
+            this.ioe = null;
             throw new RuntimeException("Server thread threw exception.", ioe);
         }
     }
