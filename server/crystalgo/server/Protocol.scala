@@ -53,7 +53,7 @@ object ServerProtocol {
           case Black => "black "
           case White => "white "
         }) + move.map {
-        case ProC2S.Pass => " pass"; case ProC2S.Place(x, y) => s" $x $y"
+        case ProC2S.Pass => "pass"; case ProC2S.Place(x, y) => s"$x $y"
       }.getOrElse(""))
     case Msg(msg) => Vector("msg " + msg)
   }
