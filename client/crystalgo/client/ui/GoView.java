@@ -29,6 +29,7 @@ public final class GoView extends JPanel {
         );
         game.addStateListener(state -> {
             jBoard.setBoard(state.getBoard());
+            jBoard.highlight(state.getPreviousMove().orElse(null));
             if (state.getWinner() != Role.spectate) {
                 Role role = state.getWinner();
                 JOptionPane.showMessageDialog(jBoard, role + " has won.", role + " has won.",

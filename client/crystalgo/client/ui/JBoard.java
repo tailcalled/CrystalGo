@@ -1,6 +1,7 @@
 package crystalgo.client.ui;
 
 import crystalgo.client.Board;
+import crystalgo.client.Move;
 import crystalgo.client.SpotColor;
 
 import javax.swing.*;
@@ -17,15 +18,16 @@ import java.util.function.Consumer;
 public final class JBoard extends JComponent {
 
     private Board board;
-    private Color white = new Color(60, 60, 60), black = Color.black;
-    private int cellPix = 32, borderPix = 4;
+    private Color white = Color.white, black = Color.black, highlight_color = Color.green;
+    private int cellPix = 32, borderPix = 1;
     private ArrayList<Consumer<Point>> pressListeners = new ArrayList<>();
+    private Move highlight;
 
     public JBoard(Board board) {
         this.board = board;
         setOpaque(true);
-        setBackground(Color.white);
-        setForeground(Color.black);
+        setBackground(new Color(0x44, 0x44, 0x44));
+        setForeground(new Color(0x55, 0x55, 0x55));
         updateSize();
         addMouseListener(new JBML());
     }
@@ -53,9 +55,13 @@ public final class JBoard extends JComponent {
     public void setBoard(Board board) {
         Board b = this.board;
         this.board = board;
+        this.highlight = null;
         if (b.height != board.height || b.width != board.width)
             updateSize();
         repaint();
+    }
+    public void highlight(Move move) {
+        this.highlight = move;
     }
 
     public int getCellPix() {
@@ -78,7 +84,7 @@ public final class JBoard extends JComponent {
 
     private void updateSize() {
         int f = cellPix + borderPix;
-        Dimension dim = new Dimension(borderPix + f * board.width, borderPix + f * board.height);
+        Dimension dim = new Dimension(borderPix + f * getBoard().width, borderPix + f * getBoard().height);
         setSize(dim);
         setPreferredSize(dim);
     }
@@ -101,7 +107,7 @@ public final class JBoard extends JComponent {
     @Override
     public Dimension getSize() {
         int f = cellPix;
-        return new Dimension(f * board.width, f * board.height);
+        return new Dimension(f * getBoard().width, f * getBoard().height);
     }
 
     @Override
@@ -118,30 +124,47 @@ public final class JBoard extends JComponent {
         int f = cellPix;
         g.setColor(getForeground());
         int offset = (cellPix - borderPix) / 2;
-        for (int x = 0; x < board.width; x++) {
+        for (int x = 0; x < getBoard().width; x++) {
             g.fillRect(offset + x * f, offset, borderPix, getHeight() - 2 * offset);
         }
-        for (int y = 0; y < board.height; y++) {
+        for (int y = 0; y < getBoard().height; y++) {
             g.fillRect(offset, offset + y * f, getWidth() - 2 * offset, borderPix);
         }
-        for (int x = 0; x < board.width; x++) {
-            for (int y = 0; y < board.height; y++) {
-                SpotColor sc = board.get(x, y);
+        g.setStroke(thinStroke);
+        for (int x = 0; x < getBoard().width; x++) {
+            for (int y = 0; y < getBoard().height; y++) {
+                SpotColor sc = getBoard().get(x, y);
                 switch (sc) {
                     case black:
                         g.setColor(this.black);
+                        fillCircle(x*f + cellPix/2, y*f + cellPix/2, cellPix/2 - 4, g);
                         break;
                     case white:
                         g.setColor(this.white);
+                        fillCircle(x*f + cellPix/2, y*f + cellPix/2, cellPix/2 - 4, g);
+                        g.setColor(this.black);
+                        drawCircle(x*f + cellPix/2, y*f + cellPix/2, cellPix/2 - 4, g);
                         break;
-                    case empty:
-                        continue;
                 }
-                g.fillOval(2 + f * x, 2 + f * y, cellPix - 4, cellPix - 4);
             }
+        }
+        if (highlight != null) {
+            g.setColor(this.highlight_color);
+            g.setStroke(highlightStroke);
+            int x = highlight.x;
+            int y = highlight.y;
+            drawCircle(x*f + cellPix/2, y*f + cellPix/2, 5, g);
         }
         g.dispose();
     }
+    private void drawCircle(int x, int y, int r, Graphics g) {
+        g.drawOval(x - r, y - r, 2*r, 2*r);
+    }
+    private void fillCircle(int x, int y, int r, Graphics g) {
+        g.fillOval(x - r, y - r, 2*r, 2*r);
+    }
+    private static final Stroke thinStroke = new BasicStroke(2);
+    private static final Stroke highlightStroke = new BasicStroke(3f);
 
     public void addPressListener(Consumer<Point> l) {
         pressListeners.add(l);
@@ -158,14 +181,14 @@ public final class JBoard extends JComponent {
 
         @Override
         public void mousePressed(MouseEvent mouseEvent) {
-            press_x = getCell(mouseEvent.getX(), board.width);
-            press_y = getCell(mouseEvent.getY(), board.height);
+            press_x = getCell(mouseEvent.getX(), getBoard().width);
+            press_y = getCell(mouseEvent.getY(), getBoard().height);
         }
 
         @Override
         public void mouseReleased(MouseEvent mouseEvent) {
-            int px = getCell(mouseEvent.getX(), board.width);
-            int py = getCell(mouseEvent.getY(), board.height);
+            int px = getCell(mouseEvent.getX(), getBoard().width);
+            int py = getCell(mouseEvent.getY(), getBoard().height);
             if (px != press_x || py != press_y)
                 return;
             if (px == -1 || py == -1)
