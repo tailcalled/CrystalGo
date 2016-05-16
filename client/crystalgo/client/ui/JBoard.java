@@ -18,7 +18,8 @@ import java.util.function.Consumer;
 public final class JBoard extends JComponent {
 
     private Board board;
-    private Color white = Color.white, black = Color.black, highlight_color = Color.green;
+    private Color white = Color.white, black = Color.black,
+            black_highlight_color = Color.green, white_highlight_color = Color.blue;
     private int cellPix = 33, borderPix = 1;
     private ArrayList<Consumer<Point>> pressListeners = new ArrayList<>();
     private Move highlight;
@@ -114,6 +115,11 @@ public final class JBoard extends JComponent {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics.create();
+        Rectangle bounds = g.getClipBounds();
+        double factor1 = bounds.getWidth() / (double)getWidth();
+        double factor2 = bounds.getHeight() / (double)getHeight();
+        double factor = Math.min(factor1, factor2);
+        g.scale(factor, factor);
         if (isOpaque()) {
             g.setColor(getBackground());
             int w = getWidth();
@@ -131,6 +137,8 @@ public final class JBoard extends JComponent {
             g.fillRect(offset, offset + y * f, getWidth() - 2 * offset, borderPix);
         }
         g.setStroke(thinStroke);
+        int hx = highlight == null ? -1 : highlight.x;
+        int hy = highlight == null ? -1 : highlight.y;
         for (int x = 0; x < getBoard().width; x++) {
             for (int y = 0; y < getBoard().height; y++) {
                 SpotColor sc = getBoard().get(x, y);
@@ -138,22 +146,22 @@ public final class JBoard extends JComponent {
                     case black:
                         g.setColor(this.black);
                         fillCircle(x*f + offset, y*f + offset, cellPix/2 - 4, g);
+                        if (hx == x && hy == y) {
+                            g.setColor(this.black_highlight_color);
+                            drawCircle(x*f + offset, y*f + offset, offset - 4, g);
+                        }
                         break;
                     case white:
                         g.setColor(this.white);
                         fillCircle(x*f + offset, y*f + offset, offset - 4, g);
-                        g.setColor(this.black);
+                        if (hx == x && hy == y)
+                            g.setColor(this.white_highlight_color);
+                        else
+                            g.setColor(this.black);
                         drawCircle(x*f + offset, y*f + offset, offset - 4, g);
                         break;
                 }
             }
-        }
-        if (highlight != null) {
-            g.setColor(this.highlight_color);
-            g.setStroke(highlightStroke);
-            int x = highlight.x;
-            int y = highlight.y;
-            drawCircle(x*f + offset, y*f + offset, 5, g);
         }
         g.dispose();
     }
@@ -164,7 +172,6 @@ public final class JBoard extends JComponent {
         g.fillOval(x - r, y - r, 2*r, 2*r);
     }
     private static final Stroke thinStroke = new BasicStroke(2);
-    private static final Stroke highlightStroke = new BasicStroke(3f);
 
     public void addPressListener(Consumer<Point> l) {
         pressListeners.add(l);
