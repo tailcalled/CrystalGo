@@ -19,7 +19,7 @@ public final class JBoard extends JComponent {
 
     private Board board;
     private Color white = Color.white, black = Color.black, highlight_color = Color.green;
-    private int cellPix = 32, borderPix = 1;
+    private int cellPix = 33, borderPix = 1;
     private ArrayList<Consumer<Point>> pressListeners = new ArrayList<>();
     private Move highlight;
 
@@ -123,7 +123,7 @@ public final class JBoard extends JComponent {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         int f = cellPix;
         g.setColor(getForeground());
-        int offset = (cellPix - borderPix) / 2;
+        int offset = cellPix / 2;
         for (int x = 0; x < getBoard().width; x++) {
             g.fillRect(offset + x * f, offset, borderPix, getHeight() - 2 * offset);
         }
@@ -137,13 +137,13 @@ public final class JBoard extends JComponent {
                 switch (sc) {
                     case black:
                         g.setColor(this.black);
-                        fillCircle(x*f + cellPix/2, y*f + cellPix/2, cellPix/2 - 4, g);
+                        fillCircle(x*f + offset, y*f + offset, cellPix/2 - 4, g);
                         break;
                     case white:
                         g.setColor(this.white);
-                        fillCircle(x*f + cellPix/2, y*f + cellPix/2, cellPix/2 - 4, g);
+                        fillCircle(x*f + offset, y*f + offset, offset - 4, g);
                         g.setColor(this.black);
-                        drawCircle(x*f + cellPix/2, y*f + cellPix/2, cellPix/2 - 4, g);
+                        drawCircle(x*f + offset, y*f + offset, offset - 4, g);
                         break;
                 }
             }
@@ -153,7 +153,7 @@ public final class JBoard extends JComponent {
             g.setStroke(highlightStroke);
             int x = highlight.x;
             int y = highlight.y;
-            drawCircle(x*f + cellPix/2, y*f + cellPix/2, 5, g);
+            drawCircle(x*f + offset, y*f + offset, 5, g);
         }
         g.dispose();
     }
