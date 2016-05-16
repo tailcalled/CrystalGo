@@ -42,6 +42,7 @@ public class Connection implements Closeable, Flushable {
             return r;
         } else {
             out.println(wish.toString());
+            out.flush();
             String role = nextLine();
             if (role.equals("no")) {
                 return null;
@@ -79,6 +80,10 @@ public class Connection implements Closeable, Flushable {
         }
     }
 
+    public void doMove(Move move) {
+        out.println(move.x + " " + move.y);
+    }
+
     private BoardPacket fetchBoard() throws IOException {
         String l = nextLine();
         String[] line = l.split(" ");
@@ -91,7 +96,7 @@ public class Connection implements Closeable, Flushable {
         String[] points = nextLine().split(" ");
         int black_points = Integer.parseInt(points[0]);
         int white_points = Integer.parseInt(points[1]);
-        Role turn = Role.valueOf(points[2]);
+        Role turn = Role.valueOf(points[2].toLowerCase());
         Move move;
         if (points.length > 3)
             move = new Move(Integer.parseInt(points[3]), Integer.parseInt(points[4]));
