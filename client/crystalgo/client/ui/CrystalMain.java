@@ -30,7 +30,7 @@ public class CrystalMain {
         } catch (Exception e) { /* we can run without native ui */ }
         Connection connection = new Connection(ip, port);
         Role role = connection.getRole(null);
-        JFrame window = new JFrame("Go");
+        JFrame window = new JFrame("Crystal Go");
         window.setLayout(new BorderLayout());
         NetGame game = new NetGame(connection);
         CrystalView view = new CrystalView(game, window);
