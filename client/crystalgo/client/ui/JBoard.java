@@ -97,7 +97,8 @@ public final class JBoard extends JComponent {
 
     @Override
     public Dimension getMinimumSize() {
-        return new Dimension(getBoard().width * 2, getBoard().height * 2);
+        return getPreferredSize();
+        //return new Dimension(getBoard().width * 2, getBoard().height * 2);
     }
 
     @Override
@@ -110,35 +111,34 @@ public final class JBoard extends JComponent {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics.create();
-        int w = getWidth();
-        int h = getHeight();
+        int bw = getBoard().width;
+        int bh = getBoard().height;
+        double w = getWidth() / (double) bw;
+        double h = getHeight() / (double) bh;
+        int s = (int) Math.min(w, h);
         if (isOpaque()) {
             g.setColor(getBackground());
-            g.fillRect(0, 0, w, h);
+            g.fillRect(0, 0, s * bw, s * bh);
         }
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(getForeground());
-        int bw = getBoard().width;
-        int bh = getBoard().height;
-        int lineHeight = ((bh-1)*h) / bh + 1;
-        int lineLength = ((bw-1)*w) / bw + 1;
+        int lineHeight = s * (bh - 1);
+        int lineLength = s * (bw - 1);
         for (int x = 0; x < bw; x++) {
-            int pixx = ((2*x + 1) * w) / (2 * bw);
-            g.fillRect(pixx, w / (2*bw), borderPix, lineHeight);
+            g.fillRect(s * x + s/2, s / 2, borderPix, lineHeight);
         }
         for (int y = 0; y < getBoard().height; y++) {
-            int pixy = ((2*y + 1) * h) / (2 * bh);
-            g.fillRect(h / (2*bh), pixy, lineLength, borderPix);
+            g.fillRect(s / 2, s * y + s/2, lineLength, borderPix);
         }
         g.setStroke(thinStroke);
         int hx = highlight == null ? -1 : highlight.x;
         int hy = highlight == null ? -1 : highlight.y;
-        int circr = Math.min((45*w) / (100*bw), (45*h) / (100*bh));
+        int circr = s * 45 / 100;
         for (int x = 0; x < getBoard().width; x++) {
-            int pixx = ((2*x + 1) * w) / (2 * bw);
+            int pixx = s * x + s / 2;
             for (int y = 0; y < getBoard().height; y++) {
                 SpotColor sc = getBoard().get(x, y);
-                int pixy = ((2*y + 1) * h) / (2 * bh);
+                int pixy = s * y + s / 2;
                 switch (sc) {
                     case black:
                         g.setColor(this.black);
