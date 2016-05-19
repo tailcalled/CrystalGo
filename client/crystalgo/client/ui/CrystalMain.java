@@ -27,7 +27,7 @@ public class CrystalMain {
         }
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (Exception e) { /* we can run without native ui */ }
+        } catch (Exception e) { System.err.println("Unable to load native UI, starting anyway."); }
         Connection connection = new Connection(ip, port);
         Role role = connection.getRole(null);
         JFrame window = new JFrame("Crystal Go");
