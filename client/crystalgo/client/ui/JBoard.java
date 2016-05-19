@@ -29,7 +29,6 @@ public final class JBoard extends JComponent {
         setOpaque(true);
         setBackground(new Color(0x44, 0x44, 0x44));
         setForeground(new Color(0x55, 0x55, 0x55));
-        updateSize();
         addMouseListener(new JBML());
     }
 
@@ -58,7 +57,7 @@ public final class JBoard extends JComponent {
         this.board = board;
         this.highlight = null;
         if (b.height != board.height || b.width != board.width)
-            updateSize();
+            revalidate();
         repaint();
     }
     public void highlight(Move move) {
@@ -71,7 +70,6 @@ public final class JBoard extends JComponent {
 
     public void setCellPix(int cellPix) {
         this.cellPix = cellPix;
-        updateSize();
     }
 
     public int getBorderPix() {
@@ -80,13 +78,6 @@ public final class JBoard extends JComponent {
 
     public void setBorderPix(int borderPix) {
         this.borderPix = borderPix;
-        updateSize();
-    }
-
-    private void updateSize() {
-        Dimension dim = getPreferredSize();
-        setSize(dim);
-        setPreferredSize(dim);
     }
 
     @Override
