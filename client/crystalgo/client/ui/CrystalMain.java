@@ -34,6 +34,7 @@ public class CrystalMain {
         window.setLayout(new BorderLayout());
         NetGame game = new NetGame(connection);
         CrystalView view = new CrystalView(game, window);
+        window.setBackground(view.jBoard.getBackground());
         window.add(view);
         window.setPreferredSize(view.getPreferredSize());
         window.pack();

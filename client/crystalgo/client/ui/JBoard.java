@@ -84,81 +84,78 @@ public final class JBoard extends JComponent {
     }
 
     private void updateSize() {
-        int f = cellPix + borderPix;
-        Dimension dim = new Dimension(borderPix + f * getBoard().width, borderPix + f * getBoard().height);
+        Dimension dim = getPreferredSize();
         setSize(dim);
         setPreferredSize(dim);
     }
 
     @Override
-    public Dimension getPreferredSize() {
-        return getSize();
-    }
-
-    @Override
     public Dimension getMaximumSize() {
-        return getSize();
+        Dimension dim = getPreferredSize();
+        return new Dimension(dim.width * 16, dim.height * 16);
     }
 
     @Override
     public Dimension getMinimumSize() {
-        return getSize();
+        return new Dimension(getBoard().width * 2, getBoard().height * 2);
     }
 
     @Override
-    public Dimension getSize() {
+    public Dimension getPreferredSize() {
         int f = cellPix;
-        return new Dimension(f * getBoard().width, f * getBoard().height);
+        return new Dimension(f * getBoard().width - f, f * getBoard().height - f);
     }
 
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics.create();
-        Rectangle bounds = g.getClipBounds();
-        double factor1 = bounds.getWidth() / (double)getWidth();
-        double factor2 = bounds.getHeight() / (double)getHeight();
-        double factor = Math.min(factor1, factor2);
-        g.scale(factor, factor);
+        int w = getWidth();
+        int h = getHeight();
         if (isOpaque()) {
             g.setColor(getBackground());
-            int w = getWidth();
-            int h = getHeight();
             g.fillRect(0, 0, w, h);
         }
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        int f = cellPix;
         g.setColor(getForeground());
-        int offset = cellPix / 2;
-        for (int x = 0; x < getBoard().width; x++) {
-            g.fillRect(offset + x * f, offset, borderPix, getHeight() - 2 * offset);
+        int bw = getBoard().width;
+        int bh = getBoard().height;
+        int lineHeight = ((bh-1)*h) / bh + 1;
+        int lineLength = ((bw-1)*w) / bw + 1;
+        for (int x = 0; x < bw; x++) {
+            int pixx = ((2*x + 1) * w) / (2 * bw);
+            g.fillRect(pixx, w / (2*bw), borderPix, lineHeight);
         }
         for (int y = 0; y < getBoard().height; y++) {
-            g.fillRect(offset, offset + y * f, getWidth() - 2 * offset, borderPix);
+            int pixy = ((2*y + 1) * h) / (2 * bh);
+            g.fillRect(h / (2*bh), pixy, lineLength, borderPix);
         }
         g.setStroke(thinStroke);
         int hx = highlight == null ? -1 : highlight.x;
         int hy = highlight == null ? -1 : highlight.y;
+        int circr = Math.min((45*w) / (100*bw), (45*h) / (100*bh));
         for (int x = 0; x < getBoard().width; x++) {
+            int pixx = ((2*x + 1) * w) / (2 * bw);
             for (int y = 0; y < getBoard().height; y++) {
                 SpotColor sc = getBoard().get(x, y);
+                int pixy = ((2*y + 1) * h) / (2 * bh);
                 switch (sc) {
                     case black:
                         g.setColor(this.black);
-                        fillCircle(x*f + offset, y*f + offset, cellPix/2 - 4, g);
+                        fillCircle(pixx, pixy, circr, g);
                         if (hx == x && hy == y) {
                             g.setColor(this.black_highlight_color);
-                            drawCircle(x*f + offset, y*f + offset, offset - 4, g);
+                            drawCircle(pixx, pixy, circr, g);
                         }
                         break;
                     case white:
                         g.setColor(this.white);
-                        fillCircle(x*f + offset, y*f + offset, offset - 4, g);
+                        fillCircle(pixx, pixy, circr, g);
                         if (hx == x && hy == y)
                             g.setColor(this.white_highlight_color);
                         else
                             g.setColor(this.black);
-                        drawCircle(x*f + offset, y*f + offset, offset - 4, g);
+                        drawCircle(pixx, pixy, circr, g);
                         break;
                 }
             }
