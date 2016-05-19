@@ -47,6 +47,7 @@ object CrystalUI {
   val crossr = new Image(classOf[CrystalUI].getResourceAsStream("images/crossr.png"))
   val crossu = new Image(classOf[CrystalUI].getResourceAsStream("images/crossu.png"))
   val logo = new Image(classOf[CrystalUI].getResourceAsStream("images/logo.png"))
+  val logosmall = new Image(classOf[CrystalUI].getResourceAsStream("images/logosmall.png"))
   
   def load() = {}
   
@@ -74,6 +75,7 @@ class CrystalUI extends Application {
     })
     menuTab.setContent(menu)
     tabs.getTabs.add(menuTab)
+    stage.getIcons.add(CrystalUI.logosmall)
     stage.setScene(new Scene(tabs))
     stage.show()
     stage.setOnCloseRequest(new EventHandler[WindowEvent]() {
