@@ -44,7 +44,7 @@ public class CrystalMain {
         game.startThread();
         while (game.getState().getWinner() == Role.spectate) {
             Thread.sleep(10);
-            game.getState();
+            game.getState(); // this detects errors in the server connection thread using side-effects.
         }
     }
 
