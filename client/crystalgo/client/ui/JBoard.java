@@ -248,7 +248,7 @@ public final class JBoard extends JComponent {
     private class JBMML implements MouseMotionListener {
         private final JBML jbml;
 
-        JBMML(JBML jbml) {
+        public JBMML(JBML jbml) {
             this.jbml = jbml;
         }
 
