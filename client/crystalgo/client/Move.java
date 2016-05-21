@@ -7,10 +7,15 @@ package crystalgo.client;
 public final class Move {
 
     public final int x, y;
+    public static final Move pass = new Move(-1, -1);
 
     public Move(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public boolean isPass() {
+        return x == -1;
     }
 
     public String toString() {

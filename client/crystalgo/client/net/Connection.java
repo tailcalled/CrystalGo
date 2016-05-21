@@ -98,10 +98,11 @@ public class Connection implements Closeable, Flushable {
         int white_points = Integer.parseInt(points[1]);
         Role turn = Role.valueOf(points[2].toLowerCase());
         Move move;
-        if (points.length > 3)
+        if (points.length > 4)
             move = new Move(Integer.parseInt(points[3]), Integer.parseInt(points[4]));
-        else
-            move = null;
+        else if (points.length == 4)
+            move = Move.pass;
+        else move = null;
         return new BoardPacket(b, move, turn, white_points, black_points);
     }
     private String nextLine() throws IOException {
@@ -127,6 +128,10 @@ public class Connection implements Closeable, Flushable {
     @Override
     public void flush() throws IOException {
         out.flush();
+    }
+
+    public void doPass() {
+        out.println("pass");
     }
 }
 

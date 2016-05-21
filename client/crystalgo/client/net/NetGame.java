@@ -111,6 +111,17 @@ public class NetGame implements GoGame {
         }
     }
 
+    @Override
+    public void doPass() {
+        checkThread();
+        connection.doPass();
+        try {
+            connection.flush();
+        } catch (IOException ioe) {
+            this.ioe = ioe;
+        }
+    }
+
     private void checkThread() {
         if (ioe != null) {
             IOException ioe = this.ioe;

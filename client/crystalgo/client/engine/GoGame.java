@@ -20,4 +20,5 @@ public interface GoGame {
 
     void doMove(Move move);
 
+    void doPass();
 }

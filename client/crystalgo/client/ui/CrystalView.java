@@ -21,7 +21,7 @@ public final class CrystalView extends JPanel {
 
     public CrystalView(GoGame game, Container comp) {
         this.game = game;
-        this.crystalControls = new CrystalControls();
+        this.crystalControls = new CrystalControls(game::doPass);
         this.msgs = new JTextArea(20, 20);
         this.msgin = new JTextField(20);
         jBoard = new JBoard(game.getState().getBoard());
@@ -37,19 +37,23 @@ public final class CrystalView extends JPanel {
         sidebar.add(crystalControls, BorderLayout.NORTH);
         sidebar.add(msgs, BorderLayout.CENTER);
         sidebar.add(msgin, BorderLayout.SOUTH);
+        msgs.setEditable(false);
         this.add(sidebar, BorderLayout.EAST);
 
 
-        game.addInvalidMoveListener(state ->
-                JOptionPane.showMessageDialog(jBoard, "Invalid move.", "Invalid move.", JOptionPane.ERROR_MESSAGE)
-        );
+        game.addInvalidMoveListener(state -> {
+            jBoard.setHoverColor(Color.red);
+            jBoard.repaint();
+        });
         game.addStateListener(state -> {
             jBoard.setBoard(state.getBoard());
-            jBoard.highlight(state.getPreviousMove().orElse(null));
+            Move prev = state.getPreviousMove().orElse(null);
+            jBoard.highlight(prev);
+            if (prev != null && prev.isPass()) {
+                msgs.append(state.getTurn().inverse() + " has passed!\n");
+            }
             if (state.getWinner() != Role.spectate) {
-                Role role = state.getWinner();
-                JOptionPane.showMessageDialog(jBoard, role + " has won.", role + " has won.",
-                        JOptionPane.INFORMATION_MESSAGE);
+                msgs.append(state.getWinner() + " has passed!\n");
             }
         });
         jBoard.addPressListener(point -> {

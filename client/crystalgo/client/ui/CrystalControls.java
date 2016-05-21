@@ -8,6 +8,10 @@ import javax.swing.*;
  */
 public class CrystalControls extends JPanel {
 
-
+    public CrystalControls(Runnable onPass) {
+        JButton button = new JButton("Pass");
+        button.addActionListener(e -> onPass.run());
+        this.add(button);
+    }
 
 }
