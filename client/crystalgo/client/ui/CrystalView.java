@@ -53,7 +53,7 @@ public final class CrystalView extends JPanel {
                 msgs.append(state.getTurn().inverse() + " has passed!\n");
             }
             if (state.getWinner() != Role.spectate) {
-                msgs.append(state.getWinner() + " has passed!\n");
+                msgs.append(state.getWinner() + " wins!\n");
             }
         });
         jBoard.addPressListener(point -> {
